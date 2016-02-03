@@ -1,0 +1,93 @@
+//默认字体
+$baseFontSize: 32px !default;
+//是否调试模式
+$if_debug: true;
+//是否是ie
+$if_ie: true;
+//边框粗细
+$border_px: 1px;
+$btn_background_color:#ffac40;
+//边框颜色（充满整个页面的边框）
+$border_color:#E2E1E6;
+//边框颜色（与左边有距离的边框）
+$border_left_color:#D9D9D9;
+// pixels to rem
+@function pxToRem($px) {
+   $temp: $px / $baseFontSize ;
+   @if $temp==0{
+       //如果是0的话还是0
+       $temp:0;
+   }@else if $temp<-0.001 {
+       //如果是负数，就不变
+       
+   } @else if $temp<0.062 {
+       //解决底分辨率手机看不到边框问题
+       $temp:0.0618760;
+   } 
+  @return $temp* 1rem;
+}
+
+// pixels to em 
+@function pxToEm($px) {
+   $temp: $px / $baseFontSize ;
+   @if $temp==0{
+       //如果是0的话还是0
+       $temp:0;
+   }@else if $temp<0.062 {
+       //解决底分辨率手机看不到边框问题
+       $temp:0.0618760;
+   } 
+  @return $temp* 1em;
+}
+
+//透明度
+@mixin opacity($opacity:50) {
+  opacity: $opacity / 100;
+  filter: alpha(opacity=$opacity);
+}
+
+//居中
+@mixin center-block {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+//底部边框
+@mixin border-bottom($size: 1px,$style:solid,$color:black) {
+    @if $size==1px{
+        //针对1px不同分辨率上面展示2px的解决方法
+         border-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAECAYAAABP2FU6AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5JREFUeNpiPnH8zH/G////MzAxAAHTyRNn/wMEGABpvQm9g9TJ1QAAAABJRU5ErkJggg==") 2 0 stretch;
+         border-width: 0px 0px pxToRem($size);
+    }@else{
+        border-bottom:pxToRem($size) $style $color;
+    }
+}
+
+//如果是debug,状态就是可见的
+.debug_show{
+    @if $if_debug {
+        display: block;
+        z-index: 9999;
+        background: red;
+        width:100%;
+        padding: 5px;
+    }@else {
+         display: none;
+    }
+}
+
+//头部左边样式为<的按钮
+@mixin arr-left {
+	background-image: url('../images/oa_left.png');
+	width: pxToRem(22px);
+	background-size:  pxToRem(25px);
+    background-repeat: no-repeat;
+    background-position-y: center;
+    margin-right: pxToRem(19px);
+    min-width:2em;
+}
+
+//头部背景色
+@mixin header_background_color {
+  background-color: #42b1e9;
+}

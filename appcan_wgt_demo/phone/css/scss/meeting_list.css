@@ -1,0 +1,23 @@
+.debug_show {
+  display: block;
+  z-index: 9999;
+  background: red;
+  width: 100%;
+  padding: 5px; }
+
+#body_meeting_list ul {
+  background-color: #ffffff;
+  border-bottom: 0.06188rem solid #E2E1E6; }
+  #body_meeting_list ul li {
+    margin-left: 0.59375rem;
+    padding: 0.46875rem 0.59375rem 0.46875rem 0;
+    background-color: #ffffff;
+    border-bottom: 0.06188rem solid #D9D9D9; }
+    #body_meeting_list ul li .out_date {
+      margin-top: 0.34375rem;
+      font-size: 95%;
+      color: #999999; }
+    #body_meeting_list ul li:last-child {
+      border-bottom: none; }
+
+/*# sourceMappingURL=meeting_list.css.map */

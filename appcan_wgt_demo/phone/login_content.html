@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="css/ui-box.css">
+        <link rel="stylesheet" href="css/ui-base.css">
+        <link rel="stylesheet" href="css/ui-color.css">
+        <link rel="stylesheet" href="css/appcan.icon.css">
+        <link rel="stylesheet" href="css/appcan.control.css">
+        <link rel="stylesheet" href="css/validaform.css">
+    </head>
+    <body class="um-vp bc-bg" ontouchstart>
+        <div id="page_0" class="up ub ub-ver" tabindex="0" style="position:relative;">
+            <div id="content" class="ub-f1 tx-l ub ub-ver c-wh1">
+                <div class="uinn ub ub-ac ub-pc">
+                    <div class="logo ub-img umhw1"></div>
+                </div>
+                <div class="uinn ub ub-ac ub-pc ub-ver">
+                    <div class="ulev1 t-blu addfont umar-t">
+                        DEMO
+                    </div>
+                    <div class="ulev1 t-blu addfont uinn">
+                        appcan
+                    </div>
+                </div>
+                <div class="ub ub-ver ub-f1">
+                    <form method="get" action="#" onsubmit="return false;">
+                        <div class="uba b-gra umar-a uc-a1 c-wh">
+                            <div class="ub ub-ac">
+                                <div class="umhw resuser ub-img umar-l"></div>
+                                <div class="ub-f1 uinput uinn">
+                                    <input placeholder="员工号" name="accountName"  value="101"  type="text" class="uc-a1" ajaxurl="http://127.0.0.1:9998/xxx/xxx/meeting_stub/validform/custNameVaild" datatype="s3-20" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="uba b-gra umar-a uc-a1 c-wh">
+                            <div class="ub ub-ac">
+                                <div class="umhw respwd ub-img umar-l"></div>
+                                <div class="ub-f1 uinput uinn">
+                                    <input placeholder="密码"  name="password" value="1" type="password" class="uc-a1" datatype="s6-20">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ub umar-a ub-ac">
+                          
+                        </div>
+                        <div class="uin uinn">
+                            <div class="btn ub ub-ac bc-text-head ub-pc bc-btn uc-a1"  id="submit">
+                                登　录
+                            </div>
+                        </div>
+                        <div class="umar-a ub t-blu">
+                            <div class="ub-f1 ulev-1 uinn3">
+                                立即注册
+                            </div>
+                            <div class="ulev-1 uinn3">
+                                无账号快捷登录
+                            </div>
+                        </div>
+                        <button type="submit"class="uinvisible"></button>
+                    </form>
+                </div>
+            </div>
+            <div id="footer" class=""></div>
+        </div>
+        <script src="js/appcan.js"></script>
+        <script src="js/appcan.control.js"></script>
+        <script src="js/jquery.js"></script>
+        <script src="js/validform.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/model.ajax.js"></script>
+    </body>
+    <script>
+        appcan.ready(function() {
+            login.initPage();//初始化页面
+        });
+        
+        var login={
+            /**
+             *表单验证对象 
+             */
+            $validaForm:null,
+            /**
+             *初始化页面 
+             */
+            initPage:function(){
+                var self=this;
+                self.ajaxServer = appcan.require('model_ajax');//缓存到对象中
+                self.initValidat();//初始化表单验证
+                self.initEvent();//初始化事件
+            },
+            /**
+             *初始化事件 
+             */
+            initEvent:function(){
+                var self=this;
+                //点击登陆按钮
+                 appcan.button("#submit", "ani-act", function() {
+                    self.doLogin();
+                });
+                //表单回车执行登陆
+                $("form").on('submit', function() {
+                    self.doLogin();
+                    return false;
+                });
+            },
+             /**
+             *初始化验证，自定义错误类型
+             */
+            initValidat: function () {
+                var self = this;
+                self.$validaForm = $("form").Validform({
+                   //自定义提示类型
+                   tiptype:function(msg,o,cssctl){
+                    //msg：提示信息;
+                    //o:{obj:*,type:*,curform:*}, obj指向的是当前验证的表单元素（或表单对象），type指示提示的状态，值为1、2、3、4， 1：正在检测/提交数据，2：通过验证，3：验证失败，4：提示ignore状态, curform为当前form对象;
+                    //cssctl:内置的提示信息样式控制函数，该函数需传入两个参数：显示提示信息的对象 和 当前提示的状态（既形参o中的type）;
+                         var $tip= $(o.obj).parent().parent().parent();
+                         $tip.removeClass('error posting');
+                         if(o&&o.type==3){
+                             //对象有错误
+                             $tip.addClass('error');
+                             TOOLS.openToast(msg, 1500, 5, 0);//提示具体错误
+                         }else if(o&&o.type==1){
+                             //正在检测/提交数据
+                             $tip.addClass('posting');
+                         }else if(o&&o.type==2){
+                             //验证通过
+                             $tip.addClass('success');
+                         } 
+                    }
+                });
+            },
+            /**
+             *表单验证 ，因为有ajax验证
+             */
+            checkForm:function(callback){
+                var self=this;
+                 //调用框架的异步验证，一般用于有ajax请求的验证，因为验证的返回不能实时，所以有callback
+                self.$validaForm.checkAjax(function(validFlag){
+                    callback(validFlag);
+                });
+                // var validFlag = self.$validaForm.check();//调用框架的同步验证，一般在没有ajax验证的情况下用
+                // callback(validFlag);
+            },
+            /**
+             *执行登陆操作 
+             */
+            doLogin:function(){
+                var self=this;
+                 //执行表单验证
+               self.checkForm(function(validFlag){
+                   if (!validFlag) {
+                       //如果有表单验证不通过，直接返回
+                        return;
+                    }
+                    var formData=$('form').serializeObject();
+                   //执行真正的登陆
+                    self.ajaxServer.login(formData,function(ajaxData){
+                         //说明登陆成功，不成功的信息都在model.ajax里面处理掉了
+                         NAV.openIndex();
+                    });
+               });
+            }
+        }
+    </script>
+</html>

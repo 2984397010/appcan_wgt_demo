@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="css/ui-box.css">
+        <link rel="stylesheet" href="css/ui-base.css">
+        <link rel="stylesheet" href="css/ui-color.css">
+        <link rel="stylesheet" href="css/appcan.icon.css">
+        <link rel="stylesheet" href="css/appcan.control.css">
+        <link rel="stylesheet" href="css/scss/meeting_list.css">
+    </head>
+    <body id="body_meeting_list" class="um-vp bc-bg" ontouchstart>
+        <div class="debug_show">
+            <!-- 通过在_main.scss里面定义的$if_debug标记来进行展示和隐藏 -->
+                                跳转到第<input id="goPageNum" value="1">页<button id="goPageBtn">GO</button>
+        </div>
+        <!--页面模板 start -->
+         <script id="tpl_meeting_list" type="text/template">
+            
+         </script>
+        <!--页面模板  end -->
+        
+        <!-- 列表 start -->
+        <div class="ub ub-ver " id="meeting_list">
+        </div>
+         <!-- 列表 end -->
+         <button class="debug_show" id="testPublish">测试通知加载第二页</button>
+        <script src="js/appcan.js"></script>
+        <script src="js/appcan.control.js"></script>
+        <script src="js/main.js"></script>
+        <script src="js/model.ajax.js"></script>
+    </body>
+    <script>
+        appcan.ready(function() {
+            meetingList.initPage();//初始化页面，注册通知等
+        });
+        /**
+         *meeting对象 
+         */
+       var meetingList = {
+           /**
+            *本页面的模板对象缓存
+            */
+            tpl:null,
+            /**
+             * 本页面的ajaxServer缓存
+             */
+            ajaxServer:null,
+            /**
+             * 默认第一页
+             */
+            currentPage:1,
+            /**
+             *注册通知 
+             */
+            initPublish:function(){
+                var self=this;
+                //注册通知，调用的时候，可以执行这个对象的所有方法
+                TOOLS.setPublish('ref_meeting_list', function (data) {
+                    //data={action:'xxx',args:[参数1,参数2]}
+                    if (!data.action) {
+                        try {
+                            data = JSON.parse(data);
+                             //执行通知的信息
+                            if(self[data.action]){
+                                //如果格式正确
+                                self[data.action].apply(self,data.args);
+                            }
+                        } catch (e) {
+                            TOOLS.logs(e.stack + "数据解析出错");
+                        }
+                    }else{
+                         TOOLS.logs("通知格式不正确");
+                    }
+                });
+            },
+          
+            /**
+             *初始化页面入口 
+             */
+            initPage : function() {
+                var self = this;
+                self.ajaxServer = appcan.require('model_ajax');//赋值到对象中
+                self.buildTpl();//编译模板
+                self.initBaseEvent();//绑定基础的页面事件
+                self.showMeetingList();//默认查询会议列表
+            },
+            /**
+             *初始化事件 
+             */
+            initEvent:function(){
+                //初始化li项目点击事件
+                appcan.button("li", "btn-act", function () {
+                    var $li=$(this);//选中的对象
+                    var id=$li.attr('data-id');//去id值
+                    //var id=$li.data('id');//第二种方法取值
+                    alert(id);
+                });
+            },
+            /**
+             *绑定基础的页面事件 
+             */
+            initBaseEvent : function() {
+                var self = this;
+                self.initPublish();//注册通知
+                 //模拟上拉刷新
+                appcan.button("#goPageBtn", "btn-act", function () {
+                    var goPageNum = $('#goPageNum').val();
+                    self.showMeetingList(goPageNum);
+                });
+                //测试通知发送，执行本页面的 meetingList的所有方法，这里测试调用第二页方法
+                appcan.button("#testPublish", "btn-act", function () {
+                    var publish={
+                        action:'showMeetingList',
+                        args:[2,10]//传入的参数，必须是数组类型的，因为执行用的是apply，查询第二页，页面大小为10
+                    }
+                   TOOLS.publish('ref_meeting_list',JSON.stringify(publish));//发送通知
+                });
+                
+                //初始化弹动和弹动事件 下拉刷新,上拖加载
+                setPageBounce(function(){
+                    //下拉刷新
+                    self.showMeetingList(1);
+                }, function(){
+                    //上拉加载，页数+1
+                     var pageNum = self.currentPage + 1;
+                     self.showMeetingList(pageNum);
+                });
+            },
+            /**
+             *编译模板 
+             */
+            buildTpl:function(){
+                var self = this;
+                // var html_tpl = $('#tpl_meeting_list').text();//当前页面的模板
+                var html_tpl='template/tpl_meeting_list.html';//模板中心的页面模板
+                self.tpl = self.ajaxServer.buildTpl(html_tpl);//赋值到对象中
+            },
+            
+            /**
+             *展示列表 
+             */
+            showMeetingList : function(pageNum,pageSize) {
+                //如果有网络异常的话，把这个方法的重新执行写入缓存中
+                TOOLS.store('RE_EVENT','meetingList.showMeetingList()');
+                 var self = this;
+                 if(!pageNum){
+                     //默认当前页
+                     pageNum=self.currentPage;
+                 }
+                 if(!pageSize){
+                     //默认每页大小
+                     pageSize=5;
+                 }
+                 if (pageNum!=1&&self.hasMore === false) {
+                    //已经全部加载完毕,第一页请求做强制刷新
+                    TOOLS.openToast('已经没有数据了', 1200, 5, 0,false);
+                    return;
+                }
+                 var data={
+                     pageNum:pageNum,
+                     pageSize:pageSize
+                 }
+                 //查询会议列表
+                self.ajaxServer.qryMeeting(data,function(ajaxData){
+                     //缓存好当前后端返回的当前页数，便于后面上拉加载更多做数值的+1
+                     //ajaxData={"status":0,"data":{"pageSize":5,"totalNum":8,"currentPage":2,"hasMore":false,"list":[{"id":"6","name":"部门会议6","date":"2015-12-11","image":"meeting_list_content/css/myImg/goods1.png"},{"id":"7","name":"云计划会谈7","date":"2015-01-11","image":"meeting_list_content/css/myImg/goods1.png"},{"id":"8","name":"云计划会谈8","date":"2015-01-11","image":"meeting_list_content/css/myImg/goods1.png"}]}}
+                    self.currentPage = ajaxData.data.currentPage;//后端返回请求的当前页，这样更准确
+                    self.hasMore = ajaxData.data.hasMore;//后端返回是否还有下一页变量，前端就不用再计算
+                    //通过模板对象输出html
+                    var html = self.tpl(ajaxData.data);//通过模板对象编译出html代码
+                    if (self.currentPage === 1) {
+                        //第一页的话，覆盖
+                        $('#meeting_list').html(html);
+                    } else {
+                        //其他几页进行追加
+                        $('#meeting_list').append(html);
+                    }
+                    self.initEvent();//TODO 绑定事件，后续可以再优化
+                });
+            }
+        }
+    </script>
+</html>

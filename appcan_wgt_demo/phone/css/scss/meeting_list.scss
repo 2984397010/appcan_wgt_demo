@@ -1,0 +1,29 @@
+@import "main";
+
+
+#body_meeting_list {
+   //会议列表
+    ul{
+         background-color: #ffffff;
+         //设置边框
+         border-bottom: pxToRem($border_px) solid $border_color;
+         li{
+              //每项数据的设置
+              margin-left:pxToRem(19px);
+              padding:pxToRem(15px) pxToRem(19px) pxToRem(15px) 0; 
+              background-color: #ffffff;
+              border-bottom: pxToRem($border_px) solid $border_left_color;
+             .out_date {
+                 //日期的设置
+                margin-top: pxToRem(11px);
+                font-size: 95%;
+                color: #999999;
+              }
+            &:last-child{
+                //最后一列不要有底部边框
+                 border-bottom: none;
+            }
+         }
+    }
+}
+

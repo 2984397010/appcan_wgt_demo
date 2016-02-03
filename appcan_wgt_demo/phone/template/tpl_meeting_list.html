@@ -1,0 +1,14 @@
+<%if(list&&list.length){%>
+   <ul>
+    <%for(var i=0;i< list.length;i++){%>
+        <li class="ub ub-ver" data-id="<%=list[i].id%>" data-store="<%=JSON.stringify(list[i])%>" >
+            <div class="ub"><%=list[i].name%></div>
+            <div class="ub out_date"><%=list[i].date%></div>
+        </li>
+    <%}%>
+    </ul>
+<%}else{%>
+    <div class="ub ub-ac ub-pc ">
+    暂无数据
+    </div>
+<%}%>

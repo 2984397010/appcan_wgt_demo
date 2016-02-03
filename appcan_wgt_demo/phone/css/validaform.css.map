@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAC,QAAQ;EACL,MAAM,EAAE,eAAe;;AAE3B,MAAM;EACF,MAAM,EAAE,aAAa;;AAEzB,QAAQ;EACJ,MAAM,EAAE,cAAc",
+"sources": ["validaform.scss"],
+"names": [],
+"file": "validaform.css"
+}
