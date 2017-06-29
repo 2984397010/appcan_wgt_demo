@@ -8,5 +8,6 @@
 	</buildSpec>
 	<natures>
 		<nature>com.appcan.ide.eclipse.hdt.appcannature</nature>
+		<nature>com.appcan.ide.eclipse.hdt.appcan4nature</nature>
 	</natures>
 </projectDescription>
